@@ -519,11 +519,12 @@ export default function SupportPage() {
                     )}
 
                     {/* 제출 버튼 */}
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full bg-blue-800 text-white py-4 rounded-lg font-semibold hover:bg-blue-900 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
+                    <div className="flex justify-center pt-2">
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="px-12 bg-blue-800 text-white py-4 rounded-lg font-semibold hover:bg-blue-900 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
                       {isSubmitting ? (
                         <>
                           <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -535,7 +536,8 @@ export default function SupportPage() {
                       ) : (
                         '문의 접수하기'
                       )}
-                    </button>
+                      </button>
+                    </div>
                   </form>
                 )}
               </div>
