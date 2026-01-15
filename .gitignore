@@ -36,6 +36,20 @@ yarn-error.log*
 # vercel
 .vercel
 
+# scripts (may contain API keys)
+/scripts/
+
+# session handoff (may contain sensitive info)
+NEXT_SESSION_REQUEST.md
+SESSION_*.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel
+
+# Wrangler cache
+.wrangler/
+**/.wrangler/
+**/node_modules/
