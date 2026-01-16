@@ -421,8 +421,8 @@ export default function SmartStorePage() {
         </div>
       </section>
 
-      {/* Process Section */}
-      <section className="section-padding bg-gray-50">
+      {/* Process Section - 정부 심사 후 노출 예정 */}
+      <section className="hidden section-padding bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">신청 절차</h2>
@@ -449,8 +449,8 @@ export default function SmartStorePage() {
         </div>
       </section>
 
-      {/* Eligibility Section */}
-      <section className="section-padding bg-white">
+      {/* Eligibility Section - 정부 심사 후 노출 예정 */}
+      <section className="hidden section-padding bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
