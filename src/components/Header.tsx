@@ -9,7 +9,7 @@ const navItems = [
   { name: '회사소개', href: '/about' },
   { name: '사업분야', href: '/business' },
   { name: '제품소개', href: '/products' },
-  { name: '소상공인스마트상점', href: '/smartstore' },
+  // { name: '소상공인스마트상점', href: '/smartstore' }, // 임시 숨김
   { name: '고객지원', href: '/support' },
 ];
 

@@ -40,11 +40,13 @@ export default function Footer() {
                   제품소개
                 </Link>
               </li>
+{/* 임시 숨김
               <li>
                 <Link href="/smartstore" className="hover:text-white transition">
                   소상공인스마트상점
                 </Link>
               </li>
+*/}
               <li>
                 <Link href="/support" className="hover:text-white transition">
                   고객지원

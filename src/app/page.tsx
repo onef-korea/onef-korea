@@ -405,7 +405,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Smart Store Section */}
+      {/* Smart Store Section - 임시 숨김 */}
+      {false && (
       <section className="py-20 bg-gradient-to-br from-blue-800 to-slate-900 text-white relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden">
@@ -656,6 +657,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* CTA Banner */}
       <section className="bg-gray-50 py-16">
