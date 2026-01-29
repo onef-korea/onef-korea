@@ -64,6 +64,18 @@ interface BoardPost {
   답변완료: boolean;
 }
 
+interface BoardDetail {
+  id: string;
+  제목: string;
+  이름: string;
+  접수일: string;
+  문의내용: string;
+  상태: string;
+  비밀글: boolean;
+  답변완료: boolean;
+  답변내용: string;
+}
+
 const API_BASE = 'https://onef-api.yangseongje87.workers.dev';
 
 const inquiryTypes = [
@@ -150,6 +162,13 @@ export default function SupportPage() {
     name: '', phone: '', title: '', content: '', isSecret: false, password: '', privacyAgreed: false,
   });
   const [boardSubmitting, setBoardSubmitting] = useState(false);
+
+  // 게시글 조회 상태
+  const [viewPost, setViewPost] = useState<BoardDetail | null>(null);
+  const [viewLoading, setViewLoading] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+  const [pendingPostId, setPendingPostId] = useState<string | null>(null);
   const [boardSubmitStatus, setBoardSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   // Turnstile 스팸 방지
@@ -174,6 +193,43 @@ export default function SupportPage() {
   }, []);
 
   useEffect(() => { fetchBoardPosts(); }, [fetchBoardPosts]);
+
+  const handleViewPost = async (postId: string, password?: string) => {
+    setViewLoading(true);
+    setPasswordError(false);
+    try {
+      const pw = password || '';
+      const res = await fetch(`${API_BASE}/board/${postId}${pw ? `?password=${encodeURIComponent(pw)}` : ''}`);
+      const data = await res.json();
+      if (!res.ok) {
+        if (data.error === 'password_required') {
+          setPendingPostId(postId);
+          setViewLoading(false);
+          return;
+        }
+        if (res.status === 403) {
+          setPasswordError(true);
+          setViewLoading(false);
+          return;
+        }
+        throw new Error(data.error);
+      }
+      setViewPost(data as BoardDetail);
+      setPendingPostId(null);
+      setPasswordInput('');
+    } catch {
+      // 조회 실패
+    } finally {
+      setViewLoading(false);
+    }
+  };
+
+  const closeViewModal = () => {
+    setViewPost(null);
+    setPendingPostId(null);
+    setPasswordInput('');
+    setPasswordError(false);
+  };
 
   // Turnstile: 입력폼 위젯 렌더링
   useEffect(() => {
@@ -370,7 +426,7 @@ export default function SupportPage() {
                 <div className="py-12 text-center text-gray-400 text-sm">등록된 문의가 없습니다.</div>
               ) : (
                 boardPosts.map((post, idx) => (
-                  <div key={post.id} className="hover:bg-gray-50 transition">
+                  <div key={post.id} className="hover:bg-gray-50 transition cursor-pointer" onClick={() => handleViewPost(post.id)}>
                     {/* 데스크톱 */}
                     <div className="hidden md:grid md:grid-cols-12 py-4 px-6 items-center">
                       <div className="col-span-1 text-center text-gray-500 text-sm">{boardPosts.length - idx}</div>
@@ -502,6 +558,84 @@ export default function SupportPage() {
                 </button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* 비밀번호 입력 모달 */}
+      {pendingPostId && !viewPost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                비밀글
+              </h3>
+              <button onClick={closeViewModal} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">비밀번호를 입력해주세요.</p>
+            <form onSubmit={(e) => { e.preventDefault(); handleViewPost(pendingPostId, passwordInput); }}>
+              <input
+                type="password"
+                value={passwordInput}
+                onChange={(e) => { setPasswordInput(e.target.value); setPasswordError(false); }}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-3 ${passwordError ? 'border-red-400' : 'border-gray-300'}`}
+                placeholder="비밀번호"
+                autoFocus
+              />
+              {passwordError && <p className="text-red-500 text-xs mb-3">비밀번호가 올바르지 않습니다.</p>}
+              <button type="submit" disabled={viewLoading || !passwordInput}
+                className="w-full bg-blue-800 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-900 transition disabled:opacity-50">
+                {viewLoading ? '확인 중...' : '확인'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 게시글 조회 모달 */}
+      {viewPost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-900 pr-4">{viewPost.제목}</h3>
+              <button onClick={closeViewModal} className="text-gray-400 hover:text-gray-600 flex-shrink-0">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-5">
+              {/* 작성 정보 */}
+              <div className="flex items-center gap-4 text-sm text-gray-500 mb-5 pb-4 border-b border-gray-100">
+                <span>작성자: {viewPost.이름}</span>
+                <span>{viewPost.접수일?.replace(/-/g, '.')}</span>
+                <span className={`inline-block text-xs px-2 py-0.5 rounded ${viewPost.답변완료 ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'}`}>
+                  {viewPost.답변완료 ? '답변완료' : '처리중'}
+                </span>
+              </div>
+
+              {/* 문의 내용 */}
+              <div className="mb-6">
+                <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{viewPost.문의내용}</p>
+              </div>
+
+              {/* 답변 */}
+              {viewPost.답변완료 && viewPost.답변내용 && (
+                <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-semibold text-blue-800">ONEF 답변</span>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{viewPost.답변내용}</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
