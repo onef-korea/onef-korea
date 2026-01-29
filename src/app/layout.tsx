@@ -64,6 +64,14 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
+      <body className="font-sans antialiased bg-gray-50">
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-ZDGW9813B1"
           strategy="afterInteractive"
@@ -76,14 +84,6 @@ export default function RootLayout({
             gtag('config', 'G-ZDGW9813B1');
           `}
         </Script>
-        <link
-          rel="stylesheet"
-          as="style"
-          crossOrigin="anonymous"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-        />
-      </head>
-      <body className="font-sans antialiased bg-gray-50">
         <ScrollAnimation />
         <Header />
         <main className="min-h-screen">{children}</main>
