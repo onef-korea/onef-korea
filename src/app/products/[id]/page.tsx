@@ -2,6 +2,11 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import JsonLd from '@/components/JsonLd';
+import {
+  generateProductSchema,
+  generateBreadcrumbSchema,
+} from '@/lib/structured-data';
 
 const API_URL = 'https://onef-api.yangseongje87.workers.dev';
 
@@ -62,6 +67,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${product.modelName} - ${product.productName} | KTT V-Cam`,
     description: product.description || product.features,
+    alternates: {
+      canonical: `/products/${id}`,
+    },
+    openGraph: {
+      title: `${product.modelName} - ${product.productName} | KTT V-Cam`,
+      description: product.description || product.features,
+      images: [
+        {
+          url: product.imageUrl,
+          width: 800,
+          height: 600,
+          alt: product.productName,
+        },
+      ],
+    },
   };
 }
 
@@ -88,6 +108,14 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   return (
     <div className="bg-gray-50 min-h-screen">
+      <JsonLd data={generateProductSchema(product)} />
+      <JsonLd
+        data={generateBreadcrumbSchema([
+          { name: '홈', href: '/' },
+          { name: '제품소개', href: '/products' },
+          { name: product.modelName, href: `/products/${product.id}` },
+        ])}
+      />
       {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -112,7 +140,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             {/* 상단: 이미지 + 제품 정보 */}
             <div className="grid lg:grid-cols-2 gap-0">
               {/* Image Section - 고정 높이 */}
-              <div className="bg-gray-50 p-8 md:p-12 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-gray-200 h-[400px] lg:h-[480px]">
+              <div className="bg-gray-50 p-6 md:p-12 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-gray-200 h-[300px] md:h-[400px] lg:h-[480px]">
                 <div className="relative w-full max-w-sm h-full">
                   <Image
                     src={product.imageUrl}
@@ -125,7 +153,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
               </div>
 
               {/* Info Section */}
-              <div className="p-8 md:p-12 flex flex-col justify-center">
+              <div className="p-6 md:p-8 lg:p-12 flex flex-col justify-center">
                 {/* Category & Tags */}
                 <div className="flex flex-wrap items-center gap-2 mb-4">
                   <span className="text-sm font-medium px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full">
@@ -157,7 +185,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
                       주요 특징
                     </h2>
-                    <ul className="grid grid-cols-2 gap-2">
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {featureList.map((feature, index) => (
                         <li key={index} className="flex items-center gap-2">
                           <svg
@@ -216,25 +244,29 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
             {/* 하단: 스펙 (기본 사양 위, 상세 사양 아래) */}
             {(specs.length > 0 || product.fullSpecs) && (
-              <div className="border-t border-gray-200 p-8 md:p-12 space-y-8">
+              <div className="border-t border-gray-200 p-6 md:p-8 lg:p-12 space-y-8">
                 {/* 기본 사양 */}
                 {specs.length > 0 && (
                   <div>
                     <h2 className="text-lg font-bold text-gray-900 mb-4">
                       기본 사양
                     </h2>
-                    <div className="bg-gray-50 rounded-xl overflow-hidden inline-block min-w-[320px] max-w-lg">
-                      <table className="w-full">
+                    <div className="bg-gray-50 rounded-xl overflow-hidden w-full max-w-lg">
+                      <table className="w-full table-fixed">
+                        <colgroup>
+                          <col className="w-[100px] md:w-[140px]" />
+                          <col />
+                        </colgroup>
                         <tbody>
                           {specs.map((spec, index) => (
                             <tr
                               key={index}
                               className={index !== specs.length - 1 ? 'border-b border-gray-200' : ''}
                             >
-                              <td className="px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">
+                              <td className="px-3 md:px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">
                                 {spec.label}
                               </td>
-                              <td className="px-4 py-3 text-sm text-gray-900">{spec.value}</td>
+                              <td className="px-3 md:px-4 py-3 text-sm text-gray-900 break-words">{spec.value}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -249,8 +281,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     <h2 className="text-lg font-bold text-gray-900 mb-4">
                       상세 사양
                     </h2>
-                    <div className="bg-gray-50 rounded-xl overflow-hidden inline-block min-w-[320px] max-w-2xl">
-                      <table className="w-full">
+                    <div className="bg-gray-50 rounded-xl overflow-hidden w-full max-w-2xl">
+                      <table className="w-full table-fixed">
+                        <colgroup>
+                          <col className="w-[100px] md:w-[140px]" />
+                          <col />
+                        </colgroup>
                         <tbody>
                           {product.fullSpecs.split('\n').filter(Boolean).map((line, index, arr) => {
                             const [label, ...valueParts] = line.split(':');
@@ -260,10 +296,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
                                 key={index}
                                 className={index !== arr.length - 1 ? 'border-b border-gray-200' : ''}
                               >
-                                <td className="px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">
+                                <td className="px-3 md:px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">
                                   {label?.trim()}
                                 </td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{value}</td>
+                                <td className="px-3 md:px-4 py-3 text-sm text-gray-900 break-words">{value}</td>
                               </tr>
                             );
                           })}

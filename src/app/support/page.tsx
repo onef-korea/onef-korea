@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import Script from 'next/script';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const faqData = [
   {
@@ -53,54 +54,17 @@ const faqData = [
   },
 ];
 
-// 샘플 게시판 데이터
-const samplePosts = [
-  {
-    id: 1,
-    category: '제품 문의',
-    title: '스마트 결제기 설치 문의드립니다',
-    author: '김*호',
-    date: '2025.01.15',
-    status: '답변완료',
-    isSecret: false,
-  },
-  {
-    id: 2,
-    category: 'A/S 문의',
-    title: '카드 단말기 오류 문의',
-    author: '이*수',
-    date: '2025.01.14',
-    status: '답변완료',
-    isSecret: true,
-  },
-  {
-    id: 3,
-    category: '스마트상점 사업',
-    title: '소상공인 지원 사업 신청 방법 문의',
-    author: '박*영',
-    date: '2025.01.13',
-    status: '답변완료',
-    isSecret: false,
-  },
-  {
-    id: 4,
-    category: '설치/시공',
-    title: '설치 일정 조율 요청드립니다',
-    author: '최*진',
-    date: '2025.01.12',
-    status: '처리중',
-    isSecret: true,
-  },
-  {
-    id: 5,
-    category: '제품 문의',
-    title: '무인매장 시스템 구축 견적 요청',
-    author: '정*현',
-    date: '2025.01.11',
-    status: '답변완료',
-    isSecret: false,
-  },
-];
+interface BoardPost {
+  id: string;
+  제목: string;
+  이름: string;
+  접수일: string;
+  상태: string;
+  비밀글: boolean;
+  답변완료: boolean;
+}
+
+const API_BASE = 'https://onef-api.yangseongje87.workers.dev';
 
 const inquiryTypes = [
   { value: '', label: '문의 유형 선택' },
@@ -111,6 +75,18 @@ const inquiryTypes = [
   { value: 'partnership', label: '제휴/협력 문의' },
   { value: 'other', label: '기타 문의' },
 ];
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+      reset: (id: string) => void;
+      remove: (id: string) => void;
+    };
+  }
+}
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
 function FAQAccordion({ category, items }: { category: string; items: { question: string; answer: string }[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -166,6 +142,107 @@ export default function SupportPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
+  // 게시판 상태
+  const [boardPosts, setBoardPosts] = useState<BoardPost[]>([]);
+  const [boardLoading, setBoardLoading] = useState(true);
+  const [showWriteModal, setShowWriteModal] = useState(false);
+  const [boardForm, setBoardForm] = useState({
+    name: '', phone: '', title: '', content: '', isSecret: false, password: '', privacyAgreed: false,
+  });
+  const [boardSubmitting, setBoardSubmitting] = useState(false);
+  const [boardSubmitStatus, setBoardSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Turnstile 스팸 방지
+  const [turnstileReady, setTurnstileReady] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [boardTurnstileToken, setBoardTurnstileToken] = useState('');
+  const formTurnstileRef = useRef<HTMLDivElement>(null);
+  const boardTurnstileRef = useRef<HTMLDivElement>(null);
+  const formWidgetId = useRef<string | null>(null);
+  const boardWidgetId = useRef<string | null>(null);
+
+  const fetchBoardPosts = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/board`);
+      const data = await res.json();
+      setBoardPosts(data.posts || []);
+    } catch {
+      setBoardPosts([]);
+    } finally {
+      setBoardLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchBoardPosts(); }, [fetchBoardPosts]);
+
+  // Turnstile: 입력폼 위젯 렌더링
+  useEffect(() => {
+    if (turnstileReady && submitStatus !== 'success' && window.turnstile && formTurnstileRef.current && !formWidgetId.current) {
+      formWidgetId.current = window.turnstile.render(formTurnstileRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        callback: (token: string) => setTurnstileToken(token),
+        'expired-callback': () => setTurnstileToken(''),
+        theme: 'light',
+      });
+    }
+  }, [turnstileReady, submitStatus]);
+
+  // Turnstile: 게시판 모달 위젯 렌더링
+  useEffect(() => {
+    if (turnstileReady && showWriteModal && boardSubmitStatus !== 'success' && window.turnstile && boardTurnstileRef.current && !boardWidgetId.current) {
+      const timer = setTimeout(() => {
+        if (boardTurnstileRef.current && window.turnstile && !boardWidgetId.current) {
+          boardWidgetId.current = window.turnstile.render(boardTurnstileRef.current, {
+            sitekey: TURNSTILE_SITE_KEY,
+            callback: (token: string) => setBoardTurnstileToken(token),
+            'expired-callback': () => setBoardTurnstileToken(''),
+            theme: 'light',
+          });
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+    if (!showWriteModal && boardWidgetId.current) {
+      try { window.turnstile?.remove(boardWidgetId.current); } catch {}
+      boardWidgetId.current = null;
+      setBoardTurnstileToken('');
+    }
+  }, [turnstileReady, showWriteModal, boardSubmitStatus]);
+
+  const handleBoardSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!boardTurnstileToken) return;
+    setBoardSubmitting(true);
+    try {
+      const res = await fetch(`${API_BASE}/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          '접수유형': '게시판',
+          '이름': boardForm.name,
+          '연락처': boardForm.phone,
+          '제목': boardForm.title,
+          '문의내용': boardForm.content,
+          '비밀글': boardForm.isSecret,
+          '글비밀번호': boardForm.password,
+          turnstileToken: boardTurnstileToken,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setBoardSubmitStatus('success');
+      setBoardForm({ name: '', phone: '', title: '', content: '', isSecret: false, password: '', privacyAgreed: false });
+      try { if (boardWidgetId.current && window.turnstile) window.turnstile.remove(boardWidgetId.current); } catch {}
+      boardWidgetId.current = null;
+      setBoardTurnstileToken('');
+      fetchBoardPosts();
+      setTimeout(() => { setShowWriteModal(false); setBoardSubmitStatus('idle'); }, 1500);
+    } catch {
+      setBoardSubmitStatus('error');
+    } finally {
+      setBoardSubmitting(false);
+    }
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -178,11 +255,31 @@ export default function SupportPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!turnstileToken) return;
     setIsSubmitting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const inquiryTypeLabel = inquiryTypes.find(t => t.value === formData.inquiryType)?.label || formData.inquiryType;
+      const res = await fetch('https://onef-api.yangseongje87.workers.dev/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          '이름': formData.name,
+          '상호명': formData.company,
+          '연락처': formData.phone,
+          '이메일': formData.email,
+          '문의유형': inquiryTypeLabel,
+          '문의내용': formData.content,
+          '접수유형': '입력폼',
+          turnstileToken: turnstileToken,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '접수 실패');
       setSubmitStatus('success');
+      try { if (formWidgetId.current && window.turnstile) window.turnstile.remove(formWidgetId.current); } catch {}
+      formWidgetId.current = null;
+      setTurnstileToken('');
       setFormData({
         name: '',
         company: '',
@@ -201,10 +298,17 @@ export default function SupportPage() {
 
   const resetForm = () => {
     setSubmitStatus('idle');
+    try { if (formWidgetId.current && window.turnstile) window.turnstile.remove(formWidgetId.current); } catch {}
+    formWidgetId.current = null;
+    setTurnstileToken('');
   };
 
   return (
     <>
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+        onReady={() => setTurnstileReady(true)}
+      />
       {/* Hero Section */}
       <section className="relative bg-gray-900 text-white overflow-hidden">
         <div className="absolute inset-0">
@@ -219,7 +323,7 @@ export default function SupportPage() {
         </div>
         <div className="relative max-w-7xl mx-auto px-4 py-16 md:py-24">
           <div className="max-w-2xl">
-            <h1 className="text-3xl md:text-5xl font-bold mb-4">고객지원</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4">고객지원</h1>
             <p className="text-sm md:text-xl text-gray-200">
               ONEF는 고객님의 만족을 최우선으로 생각합니다.<br />
               어떤 문의든 빠르고 친절하게 안내해 드리겠습니다.
@@ -231,111 +335,174 @@ export default function SupportPage() {
       {/* 문의 게시판 Section */}
       <section className="section-padding bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">문의 게시판</h2>
-            <p className="text-gray-600 text-sm mt-1">고객님들의 문의 내역을 확인하실 수 있습니다.</p>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">문의 게시판</h2>
+              <p className="text-gray-600 text-sm mt-1">고객님들의 문의 내역을 확인하실 수 있습니다.</p>
+            </div>
+            <button
+              onClick={() => setShowWriteModal(true)}
+              className="bg-blue-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-900 transition flex items-center gap-1.5"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              글쓰기
+            </button>
           </div>
 
           {/* 게시판 테이블 */}
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            {/* 테이블 헤더 - 데스크톱 */}
             <div className="hidden md:grid md:grid-cols-12 bg-gray-50 border-b border-gray-200 py-4 px-6 text-sm font-medium text-gray-600">
               <div className="col-span-1 text-center">번호</div>
-              <div className="col-span-2">분류</div>
-              <div className="col-span-5">제목</div>
-              <div className="col-span-1 text-center">작성자</div>
+              <div className="col-span-6">제목</div>
+              <div className="col-span-2 text-center">작성자</div>
               <div className="col-span-2 text-center">작성일</div>
               <div className="col-span-1 text-center">상태</div>
             </div>
 
-            {/* 게시판 목록 */}
             <div className="divide-y divide-gray-100">
-              {samplePosts.map((post) => (
-                <div
-                  key={post.id}
-                  className="hover:bg-gray-50 transition cursor-pointer"
-                >
-                  {/* 데스크톱 뷰 */}
-                  <div className="hidden md:grid md:grid-cols-12 py-4 px-6 items-center">
-                    <div className="col-span-1 text-center text-gray-500 text-sm">{post.id}</div>
-                    <div className="col-span-2">
-                      <span className="inline-block bg-blue-50 text-blue-800 text-xs px-2 py-1 rounded">
-                        {post.category}
-                      </span>
+              {boardLoading ? (
+                <div className="py-12 text-center text-gray-400 text-sm">불러오는 중...</div>
+              ) : boardPosts.length === 0 ? (
+                <div className="py-12 text-center text-gray-400 text-sm">등록된 문의가 없습니다.</div>
+              ) : (
+                boardPosts.map((post, idx) => (
+                  <div key={post.id} className="hover:bg-gray-50 transition">
+                    {/* 데스크톱 */}
+                    <div className="hidden md:grid md:grid-cols-12 py-4 px-6 items-center">
+                      <div className="col-span-1 text-center text-gray-500 text-sm">{boardPosts.length - idx}</div>
+                      <div className="col-span-6 flex items-center gap-2">
+                        <span className="text-gray-900">{post.제목}</span>
+                        {post.비밀글 && (
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                        )}
+                        {post.답변완료 && (
+                          <span className="inline-block bg-blue-50 text-blue-700 text-xs px-1.5 py-0.5 rounded">답변</span>
+                        )}
+                      </div>
+                      <div className="col-span-2 text-center text-gray-600 text-sm">{post.이름}</div>
+                      <div className="col-span-2 text-center text-gray-500 text-sm">{post.접수일?.replace(/-/g, '.')}</div>
+                      <div className="col-span-1 text-center">
+                        <span className={`inline-block text-xs px-2 py-1 rounded ${
+                          post.답변완료 ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'
+                        }`}>
+                          {post.답변완료 ? '답변완료' : '처리중'}
+                        </span>
+                      </div>
                     </div>
-                    <div className="col-span-5 flex items-center gap-2">
-                      <span className="text-gray-900 hover:text-blue-800 transition">
-                        {post.title}
-                      </span>
-                      {post.isSecret && (
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                      )}
-                    </div>
-                    <div className="col-span-1 text-center text-gray-600 text-sm">{post.author}</div>
-                    <div className="col-span-2 text-center text-gray-500 text-sm">{post.date}</div>
-                    <div className="col-span-1 text-center">
-                      <span className={`inline-block text-xs px-2 py-1 rounded ${
-                        post.status === '답변완료'
-                          ? 'bg-green-50 text-green-700'
-                          : 'bg-yellow-50 text-yellow-700'
-                      }`}>
-                        {post.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 모바일 뷰 */}
-                  <div className="md:hidden p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="inline-block bg-blue-50 text-blue-800 text-xs px-2 py-1 rounded">
-                        {post.category}
-                      </span>
-                      <span className={`inline-block text-xs px-2 py-1 rounded ${
-                        post.status === '답변완료'
-                          ? 'bg-green-50 text-green-700'
-                          : 'bg-yellow-50 text-yellow-700'
-                      }`}>
-                        {post.status}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-gray-900 font-medium">{post.title}</span>
-                      {post.isSecret && (
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                      )}
-                    </div>
-                    <div className="flex items-center text-sm text-gray-500 gap-4">
-                      <span>{post.author}</span>
-                      <span>{post.date}</span>
+                    {/* 모바일 */}
+                    <div className="md:hidden p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`inline-block text-xs px-2 py-1 rounded ${
+                          post.답변완료 ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'
+                        }`}>
+                          {post.답변완료 ? '답변완료' : '처리중'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-gray-900 font-medium">{post.제목}</span>
+                        {post.비밀글 && (
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                        )}
+                      </div>
+                      <div className="flex items-center text-sm text-gray-500 gap-4">
+                        <span>{post.이름}</span>
+                        <span>{post.접수일?.replace(/-/g, '.')}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            {/* 페이지네이션 */}
-            <div className="flex justify-center items-center gap-2 py-6 border-t border-gray-100">
-              <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button className="w-8 h-8 flex items-center justify-center rounded bg-blue-800 text-white text-sm font-medium">1</button>
-              <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-600 text-sm">2</button>
-              <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-600 text-sm">3</button>
-              <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+                ))
+              )}
             </div>
           </div>
         </div>
       </section>
+
+      {/* 글쓰기 모달 */}
+      {showWriteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-900">문의 글쓰기</h3>
+              <button onClick={() => { setShowWriteModal(false); setBoardSubmitStatus('idle'); }} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            {boardSubmitStatus === 'success' ? (
+              <div className="p-8 text-center">
+                <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="font-bold text-gray-900">문의가 등록되었습니다</p>
+                <p className="text-sm text-gray-500 mt-1">빠른 시일 내 답변드리겠습니다.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleBoardSubmit} className="p-5 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">이름 <span className="text-red-500">*</span></label>
+                    <input type="text" required value={boardForm.name} onChange={e => setBoardForm(p => ({...p, name: e.target.value}))}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="이름" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">연락처 <span className="text-red-500">*</span></label>
+                    <input type="tel" required value={boardForm.phone} onChange={e => setBoardForm(p => ({...p, phone: e.target.value}))}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="010-1234-5678" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">제목 <span className="text-red-500">*</span></label>
+                  <input type="text" required value={boardForm.title} onChange={e => setBoardForm(p => ({...p, title: e.target.value}))}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="문의 제목" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">내용 <span className="text-red-500">*</span></label>
+                  <textarea required rows={5} value={boardForm.content} onChange={e => setBoardForm(p => ({...p, content: e.target.value}))}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none" placeholder="문의하실 내용을 자세히 적어주세요." />
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+                    <input type="checkbox" checked={boardForm.isSecret} onChange={e => setBoardForm(p => ({...p, isSecret: e.target.checked}))}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-800 focus:ring-blue-500" />
+                    비밀글
+                  </label>
+                  {boardForm.isSecret && (
+                    <input type="text" value={boardForm.password} onChange={e => setBoardForm(p => ({...p, password: e.target.value}))}
+                      className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-36" placeholder="글 비밀번호" />
+                  )}
+                </div>
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input type="checkbox" required checked={boardForm.privacyAgreed} onChange={e => setBoardForm(p => ({...p, privacyAgreed: e.target.checked}))}
+                      className="mt-0.5 w-4 h-4 rounded border-gray-300 text-blue-800 focus:ring-blue-500" />
+                    <span className="text-xs text-gray-600">
+                      <span className="font-medium text-gray-900">개인정보 수집 및 이용 동의</span> <span className="text-red-500">(필수)</span><br />
+                      문의 접수를 위해 이름, 연락처를 수집합니다.
+                    </span>
+                  </label>
+                </div>
+                {boardSubmitStatus === 'error' && (
+                  <div className="bg-red-50 text-red-600 px-3 py-2 rounded-lg text-sm">등록 중 오류가 발생했습니다.</div>
+                )}
+                <div ref={boardTurnstileRef} className="flex justify-center" />
+                <button type="submit" disabled={boardSubmitting || !boardTurnstileToken}
+                  className="w-full bg-blue-800 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-900 transition disabled:opacity-50">
+                  {boardSubmitting ? '등록 중...' : '문의 등록'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* FAQ Section */}
       <section className="section-padding bg-white">
@@ -518,11 +685,14 @@ export default function SupportPage() {
                       </div>
                     )}
 
+                    {/* Turnstile 사람 인증 */}
+                    <div ref={formTurnstileRef} className="flex justify-center" />
+
                     {/* 제출 버튼 */}
                     <div className="flex justify-center pt-1">
                       <button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !turnstileToken}
                         className="px-10 bg-blue-800 text-white py-3 rounded-lg text-sm font-semibold hover:bg-blue-900 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
                       {isSubmitting ? (

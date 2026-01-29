@@ -2,17 +2,33 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import BusinessSlider from '@/components/BusinessSlider';
+import JsonLd from '@/components/JsonLd';
+import { generateBreadcrumbSchema } from '@/lib/structured-data';
 
 export const metadata: Metadata = {
   title: '사업분야',
-  description: 'ONEF의 4대 사업분야: CCTV 전국총판, 엔터테인먼트, 분양대행, 건강기능식품',
+  description: 'ONEF의 4대 사업분야: CCTV 전국총판, 엔터테인먼트, 분양대행, 건강기능식품. KT텔레캅, ADT캡스 파트너사.',
+  alternates: {
+    canonical: '/business',
+  },
+  openGraph: {
+    title: '사업분야 | ONEF - 주식회사 원에프',
+    description: 'CCTV 전국총판, 엔터테인먼트, 분양대행, 건강기능식품 - 원에프의 4대 핵심 사업영역.',
+    images: [{ url: '/images/business-hero.webp', width: 1200, height: 630 }],
+  },
 };
 
 export default function BusinessPage() {
   return (
     <div className="bg-gray-50">
+      <JsonLd
+        data={generateBreadcrumbSchema([
+          { name: '홈', href: '/' },
+          { name: '사업분야', href: '/business' },
+        ])}
+      />
       {/* Hero Section */}
-      <section className="text-white relative overflow-hidden min-h-[600px] lg:min-h-[700px]">
+      <section className="text-white relative overflow-hidden min-h-[400px] md:min-h-[600px] lg:min-h-[700px]">
         <div className="absolute inset-0">
           <Image
             src="/images/business-hero.webp"
@@ -28,10 +44,10 @@ export default function BusinessPage() {
             <span className="inline-block bg-white/20 text-white font-semibold px-4 py-1.5 rounded-full text-sm mb-4 tracking-wider backdrop-blur-sm">
               BUSINESS
             </span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6 text-white">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6 text-white">
               사업분야
             </h1>
-            <p className="text-blue-100 text-lg md:text-xl leading-relaxed">
+            <p className="text-blue-100 text-base sm:text-lg md:text-xl leading-relaxed">
               CCTV 전국총판을 기반으로 다양한 분야에서
               <br />
               <span className="text-blue-300 font-semibold">
@@ -46,7 +62,7 @@ export default function BusinessPage() {
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               4대 핵심 사업영역
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
@@ -138,7 +154,7 @@ export default function BusinessPage() {
       <section className="py-16 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               사업영역 상세
             </h2>
             <p className="text-gray-600">
@@ -152,10 +168,10 @@ export default function BusinessPage() {
       {/* CTA Section */}
       <section className="py-16 md:py-20 bg-blue-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">
             비즈니스 파트너십을 시작하세요
           </h2>
-          <p className="text-xl text-blue-200 mb-8 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-blue-200 mb-8 max-w-2xl mx-auto">
             원에프와 함께 새로운 비즈니스 기회를 만들어 보세요.
             <br />
             전문 상담원이 친절하게 안내해 드립니다.

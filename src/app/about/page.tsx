@@ -1,16 +1,36 @@
-"use client";
-
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import ScrollAnimation from "@/components/ScrollAnimation";
+import JsonLd from "@/components/JsonLd";
+import { generateBreadcrumbSchema } from "@/lib/structured-data";
+
+export const metadata: Metadata = {
+  title: "회사소개",
+  description: "주식회사 원에프는 2017년 설립, 2020년 법인전환한 AI CCTV 전문기업입니다. 고객만족, 직원행복, 동반성장을 슬로건으로 CCTV 전국총판, 엔터테인먼트, 분양대행, 건강기능식품 사업을 운영합니다.",
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "회사소개 | ONEF - 주식회사 원에프",
+    description: "AI CCTV 전문기업 주식회사 원에프. 고객만족, 직원행복, 동반성장을 추구합니다.",
+    images: [{ url: "/images/about-hero.webp", width: 1200, height: 630 }],
+  },
+};
 
 export default function AboutPage() {
   return (
     <>
+      <JsonLd
+        data={generateBreadcrumbSchema([
+          { name: "홈", href: "/" },
+          { name: "회사소개", href: "/about" },
+        ])}
+      />
       <ScrollAnimation />
 
       {/* Hero Section with Background Image */}
-      <section className="text-white relative overflow-hidden min-h-[600px] lg:min-h-[700px]">
+      <section className="text-white relative overflow-hidden min-h-[400px] md:min-h-[600px] lg:min-h-[700px]">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
@@ -46,7 +66,7 @@ export default function AboutPage() {
       {/* Tab Navigation */}
       <section className="bg-white border-b sticky top-20 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
-          <nav className="flex gap-8 overflow-x-auto">
+          <nav className="flex gap-4 sm:gap-8 overflow-x-auto">
             <a
               href="#overview"
               className="py-4 border-b-2 border-blue-800 text-blue-800 font-medium whitespace-nowrap transition-colors"
@@ -111,30 +131,30 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="scroll-animate from-right">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="group bg-gradient-to-br from-blue-800 to-blue-900 text-white rounded-2xl p-6 text-center card-hover">
-                  <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
+              <div className="grid grid-cols-2 gap-3 sm:gap-6">
+                <div className="group bg-gradient-to-br from-blue-800 to-blue-900 text-white rounded-2xl p-4 sm:p-6 text-center card-hover">
+                  <div className="text-3xl sm:text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
                     2017
                   </div>
-                  <div className="text-blue-200">설립연도</div>
+                  <div className="text-blue-200 text-sm sm:text-base">설립연도</div>
                 </div>
-                <div className="group bg-gradient-to-br from-blue-700 to-blue-800 text-white rounded-2xl p-6 text-center card-hover">
-                  <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
+                <div className="group bg-gradient-to-br from-blue-700 to-blue-800 text-white rounded-2xl p-4 sm:p-6 text-center card-hover">
+                  <div className="text-3xl sm:text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
                     2020
                   </div>
-                  <div className="text-blue-200">법인전환</div>
+                  <div className="text-blue-200 text-sm sm:text-base">법인전환</div>
                 </div>
-                <div className="group bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl p-6 text-center card-hover">
-                  <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
+                <div className="group bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl p-4 sm:p-6 text-center card-hover">
+                  <div className="text-3xl sm:text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
                     4개
                   </div>
-                  <div className="text-blue-200">사업분야</div>
+                  <div className="text-blue-200 text-sm sm:text-base">사업분야</div>
                 </div>
-                <div className="group bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 text-center card-hover">
-                  <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
+                <div className="group bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-4 sm:p-6 text-center card-hover">
+                  <div className="text-3xl sm:text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
                     13+
                   </div>
-                  <div className="text-blue-200">제품 라인업</div>
+                  <div className="text-blue-200 text-sm sm:text-base">제품 라인업</div>
                 </div>
               </div>
             </div>
@@ -145,8 +165,8 @@ export default function AboutPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* 회사명 */}
               <div className="group bg-white hover:bg-gradient-to-br hover:from-blue-800 hover:to-blue-900 rounded-xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-transparent cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
                     <svg className="w-6 h-6 text-blue-800 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
@@ -160,8 +180,8 @@ export default function AboutPage() {
 
               {/* 대표번호 */}
               <div className="group bg-white hover:bg-gradient-to-br hover:from-blue-800 hover:to-blue-900 rounded-xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-transparent cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
                     <svg className="w-6 h-6 text-blue-800 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
@@ -175,8 +195,8 @@ export default function AboutPage() {
 
               {/* 회사전화 */}
               <div className="group bg-white hover:bg-gradient-to-br hover:from-blue-800 hover:to-blue-900 rounded-xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-transparent cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
                     <svg className="w-6 h-6 text-blue-800 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 3l-6 6m0 0V4m0 5h5M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
                     </svg>
@@ -190,8 +210,8 @@ export default function AboutPage() {
 
               {/* 팩스 */}
               <div className="group bg-white hover:bg-gradient-to-br hover:from-blue-800 hover:to-blue-900 rounded-xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-transparent cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
                     <svg className="w-6 h-6 text-blue-800 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
@@ -205,8 +225,8 @@ export default function AboutPage() {
 
               {/* 설립연도 */}
               <div className="group bg-white hover:bg-gradient-to-br hover:from-blue-800 hover:to-blue-900 rounded-xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-transparent cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
                     <svg className="w-6 h-6 text-blue-800 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -220,8 +240,8 @@ export default function AboutPage() {
 
               {/* 주요사업 */}
               <div className="group bg-white hover:bg-gradient-to-br hover:from-blue-800 hover:to-blue-900 rounded-xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-transparent cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
                     <svg className="w-6 h-6 text-blue-800 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
@@ -255,7 +275,7 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-8">
             {/* 왼쪽 이미지 */}
             <div className="scroll-animate from-left">
-              <div className="rounded-2xl overflow-hidden shadow-xl h-[620px]">
+              <div className="rounded-2xl overflow-hidden shadow-xl h-[360px] lg:h-[620px]">
                 <Image
                   src="/images/ceo-greeting.webp"
                   alt="대표이사 인사말"
@@ -268,7 +288,7 @@ export default function AboutPage() {
 
             {/* 오른쪽 인사말 */}
             <div className="scroll-animate from-right">
-              <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-8 lg:p-10 shadow-lg h-[620px]">
+              <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-6 md:p-8 lg:p-10 shadow-lg lg:h-[620px]">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">
                   고객만족 · 직원행복 · 동반성장
                 </h3>
@@ -398,13 +418,13 @@ export default function AboutPage() {
           <div className="max-w-3xl mx-auto">
             <div className="relative">
               {/* Timeline Line */}
-              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-800 via-blue-500 to-blue-300"></div>
+              <div className="absolute left-6 md:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-800 via-blue-500 to-blue-300"></div>
 
               {/* Timeline Items */}
               <div className="space-y-8">
                 {/* 2024 */}
-                <div className="relative flex gap-6 scroll-animate from-left">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-800 to-blue-900 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg group-hover:scale-110 transition-transform">
+                <div className="relative flex gap-4 md:gap-6 scroll-animate from-left">
+                  <div className="w-12 h-12 md:w-16 md:h-16 text-sm md:text-base bg-gradient-to-br from-blue-800 to-blue-900 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg group-hover:scale-110 transition-transform">
                     2024
                   </div>
                   <div className="bg-white rounded-xl shadow-md p-6 flex-1 card-hover">
@@ -446,8 +466,8 @@ export default function AboutPage() {
                 </div>
 
                 {/* 2023 */}
-                <div className="relative flex gap-6 scroll-animate from-right">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-700 to-blue-800 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg">
+                <div className="relative flex gap-4 md:gap-6 scroll-animate from-right">
+                  <div className="w-12 h-12 md:w-16 md:h-16 text-sm md:text-base bg-gradient-to-br from-blue-700 to-blue-800 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg">
                     2023
                   </div>
                   <div className="bg-white rounded-xl shadow-md p-6 flex-1 card-hover">
@@ -489,8 +509,8 @@ export default function AboutPage() {
                 </div>
 
                 {/* 2022 */}
-                <div className="relative flex gap-6 scroll-animate from-left">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg">
+                <div className="relative flex gap-4 md:gap-6 scroll-animate from-left">
+                  <div className="w-12 h-12 md:w-16 md:h-16 text-sm md:text-base bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg">
                     2022
                   </div>
                   <div className="bg-white rounded-xl shadow-md p-6 flex-1 card-hover">
@@ -532,8 +552,8 @@ export default function AboutPage() {
                 </div>
 
                 {/* 2021 */}
-                <div className="relative flex gap-6 scroll-animate from-right">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg">
+                <div className="relative flex gap-4 md:gap-6 scroll-animate from-right">
+                  <div className="w-12 h-12 md:w-16 md:h-16 text-sm md:text-base bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg">
                     2021
                   </div>
                   <div className="bg-white rounded-xl shadow-md p-6 flex-1 card-hover">
@@ -575,8 +595,8 @@ export default function AboutPage() {
                 </div>
 
                 {/* 2020 */}
-                <div className="relative flex gap-6 scroll-animate from-left">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-700 to-blue-800 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg ring-4 ring-blue-200">
+                <div className="relative flex gap-4 md:gap-6 scroll-animate from-left">
+                  <div className="w-12 h-12 md:w-16 md:h-16 text-sm md:text-base bg-gradient-to-br from-blue-700 to-blue-800 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg ring-4 ring-blue-200">
                     2020
                   </div>
                   <div className="bg-white rounded-xl shadow-md p-6 flex-1 border-2 border-blue-200 card-hover">
@@ -621,8 +641,8 @@ export default function AboutPage() {
                 </div>
 
                 {/* 2017 */}
-                <div className="relative flex gap-6 scroll-animate from-right">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg ring-4 ring-blue-200">
+                <div className="relative flex gap-4 md:gap-6 scroll-animate from-right">
+                  <div className="w-12 h-12 md:w-16 md:h-16 text-sm md:text-base bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 z-10 shadow-lg ring-4 ring-blue-200">
                     2017
                   </div>
                   <div className="bg-white rounded-xl shadow-md p-6 flex-1 border-2 border-blue-200 card-hover">

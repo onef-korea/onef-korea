@@ -1,10 +1,24 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import ScrollAnimation from "@/components/ScrollAnimation";
+import JsonLd from "@/components/JsonLd";
+import { generateWebSiteSchema } from "@/lib/structured-data";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "ONEF - 주식회사 원에프 | AI CCTV 전문기업",
+    description: "원에프의 스마트 AI CCTV 솔루션은 24시간 위험으로부터 소중한 재산을 보호합니다. KTT V-Cam 공식 파트너.",
+  },
+};
 
 export default function Home() {
   return (
     <>
+      <JsonLd data={generateWebSiteSchema()} />
       <ScrollAnimation />
       {/* Hero Section */}
       <section className="text-white relative overflow-hidden min-h-[600px] lg:min-h-[700px]">
@@ -24,9 +38,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 py-20 lg:py-32 relative z-10">
           <div className="max-w-3xl">
             <div className="animate-fade-in-up">
-              <span className="inline-block bg-white text-blue-900 font-semibold px-4 py-1.5 rounded-full text-sm mb-4 tracking-wider shadow-md">KTT V-Cam 공식 파트너</span>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6 text-white">
-                <span className="whitespace-nowrap">원에프의 스마트 AI CCTV 솔루션은</span>
+              <span className="inline-block bg-white text-blue-900 font-semibold px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs md:text-sm mb-4 tracking-wider shadow-md">KTT V-Cam 공식 파트너</span>
+              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6 text-white">
+                원에프의 스마트
+                <br className="md:hidden" />
+                {' '}AI CCTV 솔루션은
                 <br />
                 24시간 위험으로부터
                 <br />
@@ -86,7 +102,7 @@ export default function Home() {
 
           <div className="grid lg:grid-cols-5 gap-12 items-stretch">
             <div className="lg:col-span-2 flex scroll-animate from-left">
-              <div className="rounded-2xl overflow-hidden shadow-xl w-full">
+              <div className="rounded-2xl overflow-hidden shadow-xl w-full max-h-[280px] lg:max-h-none">
                 <Image
                   src="/images/about-company.webp"
                   alt="주식회사 원에프"
@@ -97,12 +113,12 @@ export default function Home() {
               </div>
             </div>
             <div className="lg:col-span-3 scroll-animate from-right">
-              <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-8">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 md:mb-8">
                 우리의 슬로건
               </h3>
-              <div className="space-y-5">
-                <div className="group flex items-start gap-5 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+              <div className="space-y-3 md:space-y-5">
+                <div className="group flex items-start gap-3 md:gap-5 p-4 md:p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
                     <svg
                       className="w-8 h-8 text-blue-800"
                       fill="none"
@@ -118,14 +134,14 @@ export default function Home() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-2xl font-bold text-gray-900 mb-1">고객만족</h4>
-                    <p className="text-lg text-gray-600">
+                    <h4 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">고객만족</h4>
+                    <p className="text-base md:text-lg text-gray-600">
                       고객에게 좋은 상품을, 대응은 신속하게
                     </p>
                   </div>
                 </div>
-                <div className="group flex items-start gap-5 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                <div className="group flex items-start gap-3 md:gap-5 p-4 md:p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
                     <svg
                       className="w-8 h-8 text-blue-800"
                       fill="none"
@@ -141,14 +157,14 @@ export default function Home() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-2xl font-bold text-gray-900 mb-1">직원행복</h4>
-                    <p className="text-lg text-gray-600">
+                    <h4 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">직원행복</h4>
+                    <p className="text-base md:text-lg text-gray-600">
                       직원들에게 행복함을 주는 것을 목표
                     </p>
                   </div>
                 </div>
-                <div className="group flex items-start gap-5 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                <div className="group flex items-start gap-3 md:gap-5 p-4 md:p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
                     <svg
                       className="w-8 h-8 text-blue-800"
                       fill="none"
@@ -164,8 +180,8 @@ export default function Home() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-2xl font-bold text-gray-900 mb-1">동반성장</h4>
-                    <p className="text-lg text-gray-600">
+                    <h4 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">동반성장</h4>
+                    <p className="text-base md:text-lg text-gray-600">
                       파트너와 함께 성장하는 기업
                     </p>
                   </div>
@@ -173,20 +189,20 @@ export default function Home() {
               </div>
 
               {/* 주식회사 원에프 박스 */}
-              <div className="mt-8 bg-gradient-to-br from-blue-800 to-slate-900 rounded-2xl p-6 text-white shadow-xl">
-                <h3 className="text-xl font-bold mb-4 text-center">주식회사 원에프</h3>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className="bg-white/20 rounded-lg p-3 hover:bg-white/30 transition-colors duration-300">
-                    <div className="text-2xl font-bold">2017</div>
-                    <div className="text-sm text-blue-200">설립</div>
+              <div className="mt-6 md:mt-8 bg-gradient-to-br from-blue-800 to-slate-900 rounded-2xl p-4 md:p-6 text-white shadow-xl">
+                <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-center">주식회사 원에프</h3>
+                <div className="grid grid-cols-3 gap-2 md:gap-4 text-center">
+                  <div className="bg-white/20 rounded-lg p-2.5 md:p-3 hover:bg-white/30 transition-colors duration-300">
+                    <div className="text-xl md:text-2xl font-bold">2017</div>
+                    <div className="text-xs md:text-sm text-blue-200">설립</div>
                   </div>
-                  <div className="bg-white/20 rounded-lg p-3 hover:bg-white/30 transition-colors duration-300">
-                    <div className="text-2xl font-bold">2020</div>
-                    <div className="text-sm text-blue-200">법인전환</div>
+                  <div className="bg-white/20 rounded-lg p-2.5 md:p-3 hover:bg-white/30 transition-colors duration-300">
+                    <div className="text-xl md:text-2xl font-bold">2020</div>
+                    <div className="text-xs md:text-sm text-blue-200">법인전환</div>
                   </div>
-                  <div className="bg-white/20 rounded-lg p-3 hover:bg-white/30 transition-colors duration-300">
-                    <div className="text-2xl font-bold">4개</div>
-                    <div className="text-sm text-blue-200">사업분야</div>
+                  <div className="bg-white/20 rounded-lg p-2.5 md:p-3 hover:bg-white/30 transition-colors duration-300">
+                    <div className="text-xl md:text-2xl font-bold">4개</div>
+                    <div className="text-xs md:text-sm text-blue-200">사업분야</div>
                   </div>
                 </div>
               </div>
@@ -230,23 +246,23 @@ export default function Home() {
           </div>
 
           {/* Category Tags */}
-          <div className="flex flex-wrap justify-center gap-3 mb-10 scroll-animate from-bottom">
-            <span className="px-5 py-2 bg-blue-800 text-white rounded-full font-medium cursor-pointer hover:bg-blue-900 transition-colors">
+          <div className="grid grid-cols-3 lg:flex lg:flex-wrap lg:justify-center gap-2 lg:gap-3 mb-10 scroll-animate from-bottom">
+            <span className="px-3 lg:px-5 py-1.5 lg:py-2 bg-blue-800 text-white rounded-full text-sm lg:text-base font-medium cursor-pointer hover:bg-blue-900 transition-colors text-center">
               전체
             </span>
-            <span className="px-5 py-2 bg-white text-gray-700 rounded-full font-medium cursor-pointer hover:bg-blue-50 hover:text-blue-900 transition-colors shadow-sm">
+            <span className="px-3 lg:px-5 py-1.5 lg:py-2 bg-white text-gray-700 rounded-full text-sm lg:text-base font-medium cursor-pointer hover:bg-blue-50 hover:text-blue-900 transition-colors shadow-sm text-center">
               녹화기
             </span>
-            <span className="px-5 py-2 bg-white text-gray-700 rounded-full font-medium cursor-pointer hover:bg-blue-50 hover:text-blue-900 transition-colors shadow-sm">
+            <span className="px-3 lg:px-5 py-1.5 lg:py-2 bg-white text-gray-700 rounded-full text-sm lg:text-base font-medium cursor-pointer hover:bg-blue-50 hover:text-blue-900 transition-colors shadow-sm text-center">
               불렛 카메라
             </span>
-            <span className="px-5 py-2 bg-white text-gray-700 rounded-full font-medium cursor-pointer hover:bg-blue-50 hover:text-blue-900 transition-colors shadow-sm">
+            <span className="px-3 lg:px-5 py-1.5 lg:py-2 bg-white text-gray-700 rounded-full text-sm lg:text-base font-medium cursor-pointer hover:bg-blue-50 hover:text-blue-900 transition-colors shadow-sm text-center">
               돔 카메라
             </span>
-            <span className="px-5 py-2 bg-white text-gray-700 rounded-full font-medium cursor-pointer hover:bg-blue-50 hover:text-blue-900 transition-colors shadow-sm">
+            <span className="px-3 lg:px-5 py-1.5 lg:py-2 bg-white text-gray-700 rounded-full text-sm lg:text-base font-medium cursor-pointer hover:bg-blue-50 hover:text-blue-900 transition-colors shadow-sm text-center">
               AI 프리미엄
             </span>
-            <span className="px-5 py-2 bg-white text-gray-700 rounded-full font-medium cursor-pointer hover:bg-blue-50 hover:text-blue-900 transition-colors shadow-sm">
+            <span className="px-3 lg:px-5 py-1.5 lg:py-2 bg-white text-gray-700 rounded-full text-sm lg:text-base font-medium cursor-pointer hover:bg-blue-50 hover:text-blue-900 transition-colors shadow-sm text-center">
               화재감지
             </span>
           </div>
@@ -662,8 +678,10 @@ export default function Home() {
       {/* CTA Banner */}
       <section className="bg-gray-50 py-16">
         <div className="max-w-7xl mx-auto px-4 text-center scroll-animate from-bottom">
-          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
-            CCTV 설치, 어디서부터 시작해야 할지 모르겠다면?
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
+            CCTV 설치, 어디서부터
+            <br className="md:hidden" />
+            {' '}시작해야 할지 모르겠다면?
           </h2>
           <p className="text-gray-600 mb-8">
             전문 상담사가 친절하게 안내해드립니다

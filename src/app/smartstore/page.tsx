@@ -1,55 +1,83 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import JsonLd from '@/components/JsonLd';
+import { generateBreadcrumbSchema } from '@/lib/structured-data';
 
 export const metadata: Metadata = {
   title: '2026 소상공인스마트상점 | 원에프',
   description: '2026년 소상공인 스마트상점 기술보급사업 안내. CCTV, AI 영상분석, 화재감지 등 스마트 기술을 최대 70% 정부 지원받으세요. 배리어프리 700만원, 일반기술 500만원 한도.',
+  alternates: {
+    canonical: '/smartstore',
+  },
+  openGraph: {
+    title: '2026 소상공인 스마트상점 기술보급사업 | ONEF',
+    description: '정부 지원 최대 70%. CCTV, AI 영상분석, 화재감지 등 스마트 기술 도입 지원.',
+    images: [{ url: '/images/smartstore/hero-bg.webp', width: 1200, height: 630 }],
+  },
 };
 
-// 소상공인 스마트상점 제품 4종
-const recommendedProducts = [
-  {
-    id: 'recEpk0pFe61wbRUQ',
-    modelName: 'KTT-AI5MPCD',
-    productName: '500만 AI 컬러 돔',
-    category: 'AI 컬러',
-    imageUrl: '/images/products/ktt-ai5mpcd.webp',
-    features: ['야간 컬러 영상', 'AI 객체 감지', '양방향 오디오'],
-    highlight: 'AI 컬러',
-    size: 'large',
-  },
-  {
-    id: 'recWh887rKSZ1H4XC',
-    modelName: 'KTT-AI5MPCB',
-    productName: '500만 AI 컬러 불렛',
-    category: 'AI 컬러',
-    imageUrl: '/images/products/ktt-ai5mpcb.webp',
-    features: ['야간 컬러 영상', 'AI 객체 감지', '실외 설치'],
-    highlight: 'AI 컬러',
-    size: 'large',
-  },
-  {
-    id: 'rec30OhYAclJcskKk',
-    modelName: 'NK1080D-F1',
-    productName: '불꽃감지 돔 카메라',
-    category: '화재감지',
-    imageUrl: '/images/products/nk1080d-f1.webp',
-    features: ['화재 감지 30m', 'IR 센서', 'IP66 방수'],
-    highlight: '화재감지',
-    size: 'small',
-  },
-  {
-    id: 'recIZdaDjA0hfPZA7',
-    modelName: 'NK1080BL-AF-F2',
-    productName: '불꽃감지 불렛 카메라',
-    category: '화재감지',
-    imageUrl: '/images/products/nk1080bl-af-f2.webp',
-    features: ['화재 감지 30m', '전동줌 렌즈', '실외 설치'],
-    highlight: '화재감지',
-    size: 'small',
-  },
-];
+// 스마트상점 제품 - API에서 가져오기 (fallback 포함)
+interface SmartStoreProduct {
+  id: string;
+  modelName?: string;
+  productName?: string;
+  category?: string;
+  thumbnailUrl?: string;
+  features?: string[];
+  '스마트상점진열'?: boolean;
+}
+
+async function getSmartStoreProducts(): Promise<SmartStoreProduct[]> {
+  try {
+    const res = await fetch('https://onef-api.yangseongje87.workers.dev/products', {
+      next: { revalidate: 60 },
+    });
+    const data = await res.json();
+    const products = (data.products || []).map((p: Record<string, unknown>) => ({
+      ...p,
+      features: Array.isArray(p.features) ? p.features : typeof p.features === 'string' ? (p.features as string).split(',').map((s: string) => s.trim()) : [],
+    })) as SmartStoreProduct[];
+    const smartProducts = products.filter((p: SmartStoreProduct) => p['스마트상점진열']);
+    if (smartProducts.length > 0) return smartProducts;
+  } catch { /* fallback */ }
+
+  // Fallback: 하드코딩 제품
+  return [
+    {
+      id: 'recEpk0pFe61wbRUQ',
+      modelName: 'KTT-AI5MPCD',
+      productName: '500만 AI 컬러 돔',
+      category: 'AI 컬러',
+      thumbnailUrl: '/images/products/ktt-ai5mpcd.webp',
+      features: ['야간 컬러 영상', 'AI 객체 감지', '양방향 오디오'],
+    },
+    {
+      id: 'recWh887rKSZ1H4XC',
+      modelName: 'KTT-AI5MPCB',
+      productName: '500만 AI 컬러 불렛',
+      category: 'AI 컬러',
+      thumbnailUrl: '/images/products/ktt-ai5mpcb.webp',
+      features: ['야간 컬러 영상', 'AI 객체 감지', '실외 설치'],
+    },
+    {
+      id: 'rec30OhYAclJcskKk',
+      modelName: 'NK1080D-F1',
+      productName: '불꽃감지 돔 카메라',
+      category: '화재감지',
+      thumbnailUrl: '/images/products/nk1080d-f1.webp',
+      features: ['화재 감지 30m', 'IR 센서', 'IP66 방수'],
+    },
+    {
+      id: 'recIZdaDjA0hfPZA7',
+      modelName: 'NK1080BL-AF-F2',
+      productName: '불꽃감지 불렛 카메라',
+      category: '화재감지',
+      thumbnailUrl: '/images/products/nk1080bl-af-f2.webp',
+      features: ['화재 감지 30m', '전동줌 렌즈', '실외 설치'],
+    },
+  ];
+}
 
 const benefits = [
   {
@@ -135,9 +163,16 @@ const supportTypes = [
   },
 ];
 
-export default function SmartStorePage() {
+export default async function SmartStorePage() {
+  const recommendedProducts = await getSmartStoreProducts();
   return (
     <>
+      <JsonLd
+        data={generateBreadcrumbSchema([
+          { name: '홈', href: '/' },
+          { name: '소상공인 스마트상점', href: '/smartstore' },
+        ])}
+      />
       {/* Hero Section - 배경 이미지 적용 */}
       <section className="relative min-h-[600px] flex items-center">
         {/* 배경 이미지 */}
@@ -234,16 +269,16 @@ export default function SmartStorePage() {
                 {/* 제품 이미지 */}
                 <div className="relative aspect-square bg-gray-100 overflow-hidden">
                   <Image
-                    src={product.imageUrl}
-                    alt={product.productName}
+                    src={product.thumbnailUrl || '/images/products/placeholder.webp'}
+                    alt={product.productName || ''}
                     fill
-                    className={`object-contain group-hover:scale-105 transition-transform duration-300 ${
-                      product.size === 'small' ? 'p-10 scale-75' : 'p-4'
-                    }`}
+                    className="object-contain group-hover:scale-105 transition-transform duration-300 p-4"
                   />
-                  <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded">
-                    {product.highlight}
-                  </span>
+                  {product.category && (
+                    <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded">
+                      {product.category}
+                    </span>
+                  )}
                 </div>
 
                 {/* 제품 정보 */}
@@ -255,16 +290,18 @@ export default function SmartStorePage() {
                   <p className="text-sm text-gray-600 mb-3">{product.productName}</p>
 
                   {/* 주요 특징 */}
-                  <ul className="space-y-1">
-                    {product.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <svg className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
+                  {Array.isArray(product.features) && product.features.length > 0 && (
+                    <ul className="space-y-1">
+                      {product.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-center gap-1.5 text-xs text-gray-500">
+                          <svg className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </Link>
             ))}

@@ -201,8 +201,8 @@ export default function ProductsContent({ initialProducts }: ProductsContentProp
           <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-blue-900/70 to-transparent" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">제품소개</h1>
-          <p className="text-xl text-blue-100 max-w-xl">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6">제품소개</h1>
+          <p className="text-base sm:text-lg md:text-xl text-blue-100 max-w-xl">
             KTT V-Cam 시리즈로 완성하는 첨단 보안 솔루션
           </p>
         </div>
