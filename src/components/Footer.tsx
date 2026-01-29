@@ -5,9 +5,9 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 pt-16 pb-8">
-        <div className="grid md:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-12">
           {/* Logo & Info */}
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <Image
               src="/logo.png"
               alt="ONEF"
@@ -88,23 +88,25 @@ export default function Footer() {
           </div>
 
           {/* Contact */}
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <h4 className="font-bold mb-4">연락처</h4>
-            <ul className="space-y-2 text-gray-400 text-sm">
-              <li>
-                대표번호: <strong className="text-white">1566-0312</strong>
-              </li>
-              <li>회사전화: 032-215-2522</li>
-              <li>팩스: 032-215-2523</li>
-              <li className="pt-2">
+            <div className="grid grid-cols-2 md:block gap-4">
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li>
+                  대표번호: <strong className="text-white">1566-0312</strong>
+                </li>
+                <li>회사전화: 032-215-2522</li>
+                <li>팩스: 032-215-2523</li>
+              </ul>
+              <div className="flex items-start md:mt-4">
                 <Link
                   href="/support#inquiry-form"
                   className="inline-block bg-blue-800 text-white px-4 py-2 rounded text-sm hover:bg-blue-900 transition"
                 >
                   문의하기
                 </Link>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -122,8 +124,9 @@ export default function Footer() {
           </p>
           <p className="text-center mt-4">© 2026 ONEF. All rights reserved.</p>
         </div>
+        {/* Bottom nav spacer for mobile */}
+        <div className="h-20 lg:hidden" />
       </div>
-
     </footer>
   );
 }

@@ -131,7 +131,7 @@ function FAQAccordion({ category, items }: { category: string; items: { question
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
               className="w-full px-5 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition"
             >
-              <span className="font-medium text-gray-900 pr-4">{item.question}</span>
+              <span className="font-medium text-gray-900 pr-4 text-sm md:text-base">{item.question}</span>
               <svg
                 className={`w-5 h-5 text-gray-500 flex-shrink-0 transition-transform ${openIndex === index ? 'rotate-180' : ''}`}
                 fill="none"
@@ -219,8 +219,8 @@ export default function SupportPage() {
         </div>
         <div className="relative max-w-7xl mx-auto px-4 py-16 md:py-24">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">고객지원</h1>
-            <p className="text-xl text-gray-200">
+            <h1 className="text-3xl md:text-5xl font-bold mb-4">고객지원</h1>
+            <p className="text-sm md:text-xl text-gray-200">
               ONEF는 고객님의 만족을 최우선으로 생각합니다.<br />
               어떤 문의든 빠르고 친절하게 안내해 드리겠습니다.
             </p>
@@ -360,10 +360,10 @@ export default function SupportPage() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* 문의 접수 폼 */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">문의 접수</h2>
-                  <p className="text-gray-600 mt-1">문의사항을 남겨주시면 담당자가 빠르게 연락드리겠습니다.</p>
+              <div className="bg-white rounded-2xl p-5 md:p-8 shadow-sm">
+                <div className="mb-4 md:mb-6">
+                  <h2 className="text-lg md:text-2xl font-bold text-gray-900">문의 접수</h2>
+                  <p className="text-gray-600 mt-1 text-xs md:text-sm">문의사항을 남겨주시면 담당자가 빠르게 연락드리겠습니다.</p>
                 </div>
 
                 {submitStatus === 'success' ? (
@@ -385,11 +385,11 @@ export default function SupportPage() {
                     </button>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit} className="space-y-5">
+                  <form onSubmit={handleSubmit} className="space-y-2.5 md:space-y-4">
                     {/* 이름, 상호명 */}
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-2 md:gap-4">
                       <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="name" className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
                           이름 <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -399,12 +399,12 @@ export default function SupportPage() {
                           required
                           value={formData.name}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                          className="w-full px-3 py-1.5 md:px-4 md:py-2.5 text-xs md:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                           placeholder="홍길동"
                         />
                       </div>
                       <div>
-                        <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="company" className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
                           상호명
                         </label>
                         <input
@@ -413,16 +413,16 @@ export default function SupportPage() {
                           name="company"
                           value={formData.company}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                          className="w-full px-3 py-1.5 md:px-4 md:py-2.5 text-xs md:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                           placeholder="회사/매장명"
                         />
                       </div>
                     </div>
 
                     {/* 연락처, 이메일 */}
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-2 md:gap-4">
                       <div>
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="phone" className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
                           연락처 <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -432,12 +432,12 @@ export default function SupportPage() {
                           required
                           value={formData.phone}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                          className="w-full px-3 py-1.5 md:px-4 md:py-2.5 text-xs md:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                           placeholder="010-1234-5678"
                         />
                       </div>
                       <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="email" className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
                           이메일
                         </label>
                         <input
@@ -446,7 +446,7 @@ export default function SupportPage() {
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                          className="w-full px-3 py-1.5 md:px-4 md:py-2.5 text-xs md:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                           placeholder="example@email.com"
                         />
                       </div>
@@ -454,7 +454,7 @@ export default function SupportPage() {
 
                     {/* 문의 유형 */}
                     <div>
-                      <label htmlFor="inquiryType" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="inquiryType" className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
                         문의 유형 <span className="text-red-500">*</span>
                       </label>
                       <select
@@ -463,7 +463,7 @@ export default function SupportPage() {
                         required
                         value={formData.inquiryType}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white"
+                        className="w-full px-3 py-1.5 md:px-4 md:py-2.5 text-xs md:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white"
                       >
                         {inquiryTypes.map((type) => (
                           <option key={type.value} value={type.value}>
@@ -475,23 +475,23 @@ export default function SupportPage() {
 
                     {/* 문의 내용 */}
                     <div>
-                      <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="content" className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
                         문의 내용 <span className="text-red-500">*</span>
                       </label>
                       <textarea
                         id="content"
                         name="content"
                         required
-                        rows={6}
+                        rows={4}
                         value={formData.content}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
+                        className="w-full px-3 py-1.5 md:px-4 md:py-2.5 text-xs md:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none leading-relaxed"
                         placeholder="문의하실 내용을 자세히 적어주세요."
                       />
                     </div>
 
                     {/* 개인정보 동의 */}
-                    <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="bg-gray-50 rounded-lg p-3">
                       <label className="flex items-start gap-3 cursor-pointer">
                         <input
                           type="checkbox"
@@ -519,11 +519,11 @@ export default function SupportPage() {
                     )}
 
                     {/* 제출 버튼 */}
-                    <div className="flex justify-center pt-2">
+                    <div className="flex justify-center pt-1">
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-12 bg-blue-800 text-white py-4 rounded-lg font-semibold hover:bg-blue-900 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="px-10 bg-blue-800 text-white py-3 rounded-lg text-sm font-semibold hover:bg-blue-900 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
                       {isSubmitting ? (
                         <>
