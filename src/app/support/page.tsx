@@ -177,6 +177,7 @@ export default function SupportPage() {
 
   // Turnstile: 입력폼 위젯 렌더링
   useEffect(() => {
+    if (!TURNSTILE_SITE_KEY) { setTurnstileToken('bypass'); return; }
     if (turnstileReady && submitStatus !== 'success' && window.turnstile && formTurnstileRef.current && !formWidgetId.current) {
       formWidgetId.current = window.turnstile.render(formTurnstileRef.current, {
         sitekey: TURNSTILE_SITE_KEY,
@@ -189,6 +190,7 @@ export default function SupportPage() {
 
   // Turnstile: 게시판 모달 위젯 렌더링
   useEffect(() => {
+    if (!TURNSTILE_SITE_KEY) { setBoardTurnstileToken('bypass'); return; }
     if (turnstileReady && showWriteModal && boardSubmitStatus !== 'success' && window.turnstile && boardTurnstileRef.current && !boardWidgetId.current) {
       const timer = setTimeout(() => {
         if (boardTurnstileRef.current && window.turnstile && !boardWidgetId.current) {
